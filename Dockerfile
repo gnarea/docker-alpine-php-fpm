@@ -6,7 +6,7 @@ RUN \
     adduser www-data www-data && \
     apk add --no-cache php-fpm
 
-ADD php-fpm.conf /etc/php/
+COPY php-fpm.conf pool.conf /etc/php/
 
 EXPOSE 9000
 
