@@ -1,0 +1,14 @@
+# Docker Compose project to test PHP-FPM/Nginx integration
+
+version: "2"
+services:
+  web-app:
+    build: "php-fpm"
+    volumes:
+      - "./phpinfo.php:/opt/web-app/index.php:ro"
+  reverse-proxy:
+    build: "app-server"
+    links:
+      - "web-app:php-fpm"
+    ports:
+      - "127.0.0.1:8080:80"
