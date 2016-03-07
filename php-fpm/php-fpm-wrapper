@@ -1,0 +1,59 @@
+#!/bin/sh
+
+# Make the interpreter intolerant to errors
+set -o nounset
+set -o errexit
+set -o pipefail
+
+
+# ===== Configuration
+
+
+MEMORY_LIMIT_RATIO="0.9"
+
+
+# ===== Constants and functions
+
+
+multiply() {
+    local x="$1"
+    local y="$2"
+
+    awk -v "x=${x}" -v "y=${y}" 'BEGIN{ printf "%i" ,x * y }'
+}
+
+
+get_container_memory_bytes() {
+    cgget -n --values-only --variable memory.limit_in_bytes /
+}
+
+
+get_host_memory_bytes() {
+    free -b | egrep '^(Mem|Swap):' | awk '{i+=$2} END {print i}'
+}
+
+
+is_container_memory_limited() {
+    [ "$(get_container_memory_bytes)" -lt "$(get_host_memory_bytes)" ]
+}
+
+
+get_cli_arg_for_memory_limit() {
+    local cli_arg
+
+    if is_container_memory_limited; then
+        local container_memory_bytes="$(get_container_memory_bytes)"
+        local memory_limit_bytes="$(multiply "${container_memory_bytes}" "${MEMORY_LIMIT_RATIO}" )"
+        cli_arg="-d memory_limit=${memory_limit_bytes}"
+    else
+        cli_arg=""
+    fi
+
+    echo "${cli_arg}"
+}
+
+
+# ===== Main
+
+
+exec php-fpm $(get_cli_arg_for_memory_limit) $@
