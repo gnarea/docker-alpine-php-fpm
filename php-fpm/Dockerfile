@@ -5,9 +5,10 @@ RUN \
     addgroup www-data && \
     adduser www-data www-data && \
     echo "@testing http://dl-cdn.alpinelinux.org/alpine/edge/testing/" >> /etc/apk/repositories && \
-    apk add --no-cache php-fpm libcgroup-tools@testing
+    apk add --no-cache php-fpm libcgroup-tools@testing && \
+    rm /etc/php/php.ini
 
-COPY php-fpm.conf php-fpm-pool.conf /etc/php/
+COPY php-fpm.conf /etc/php/
 COPY default.ini /etc/php/conf.d/
 COPY php-fpm-wrapper /usr/bin/
 

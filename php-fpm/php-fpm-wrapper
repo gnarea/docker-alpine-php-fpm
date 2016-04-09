@@ -56,4 +56,4 @@ get_cli_arg_for_memory_limit() {
 # ===== Main
 
 
-exec php-fpm $(get_cli_arg_for_memory_limit) $@
+exec php-fpm -c /etc/php/php-fpm.conf $(get_cli_arg_for_memory_limit) $@
