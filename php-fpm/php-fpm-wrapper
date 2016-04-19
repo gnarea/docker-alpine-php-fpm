@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -x
 
 # Make the interpreter intolerant to errors
 set -o nounset
@@ -10,6 +10,9 @@ set -o pipefail
 
 
 MEMORY_LIMIT_RATIO="0.9"
+
+
+DEBUG_CLI_ARGS='-d display_errors=On -d display_startup_errors=On -d error_reporting=E_ALL'
 
 
 # ===== Constants and functions
@@ -53,7 +56,24 @@ get_cli_arg_for_memory_limit() {
 }
 
 
+get_cli_args_for_debugging() {
+    local cli_args
+
+    if [[ "${DEBUG-}" == "true" ]]; then
+        cli_args="${DEBUG_CLI_ARGS}"
+    else
+        cli_args=""
+    fi
+
+    echo "${cli_args}"
+}
+
+
 # ===== Main
 
 
-exec php-fpm -c /etc/php/php-fpm.conf $(get_cli_arg_for_memory_limit) $@
+exec php-fpm \
+    -c /etc/php/php-fpm.conf \
+    $(get_cli_arg_for_memory_limit) \
+    $(get_cli_args_for_debugging) \
+    $@
