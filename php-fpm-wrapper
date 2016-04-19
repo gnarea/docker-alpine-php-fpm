@@ -1,4 +1,4 @@
-#!/bin/sh -x
+#!/bin/sh
 
 # Make the interpreter intolerant to errors
 set -o nounset
