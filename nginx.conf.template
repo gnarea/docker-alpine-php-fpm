@@ -18,6 +18,8 @@ http {
     server {
         listen 80;
 
+        client_max_body_size ${MAX_REQUEST_BODY_SIZE_MB}m;
+
         root /opt/web-app;
         index index.php;
 
@@ -33,6 +35,7 @@ http {
             fastcgi_split_path_info ^(.+\.php)(/.+)$;
             include fastcgi_params;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_param PHP_VALUE "upload_max_filesize = ${MAX_FILE_UPLOAD_SIZE_MB}M \n post_max_size=${MAX_REQUEST_BODY_SIZE_MB}M";
             fastcgi_pass php-fpm:9000;
         }
     }

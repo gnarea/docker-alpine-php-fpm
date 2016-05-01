@@ -1,0 +1,26 @@
+#!/bin/sh -x
+
+# Make the interpreter intolerant to errors
+set -o nounset
+set -o errexit
+set -o pipefail
+
+
+# ===== Configuration
+
+
+NGINX_CONFIG_TEMPLATE_PATH="/etc/nginx/nginx.conf.template"
+NGINX_CONFIG_PATH="/etc/nginx/nginx.conf"
+
+MAX_REQUEST_BODY_SIZE_MB="${MAX_REQUEST_BODY_SIZE_MB-2}"
+MAX_FILE_UPLOAD_SIZE_MB="${MAX_FILE_UPLOAD_SIZE_MB-${MAX_REQUEST_BODY_SIZE_MB}}"
+
+
+# ===== Main
+
+
+export MAX_REQUEST_BODY_SIZE_MB MAX_FILE_UPLOAD_SIZE_MB
+nginx_variables='$MAX_REQUEST_BODY_SIZE_MB:$MAX_FILE_UPLOAD_SIZE_MB'
+envsubst "${nginx_variables}" < "${NGINX_CONFIG_TEMPLATE_PATH}" > "${NGINX_CONFIG_PATH}"
+
+exec nginx $@
