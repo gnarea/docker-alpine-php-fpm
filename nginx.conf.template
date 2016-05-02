@@ -21,20 +21,25 @@ http {
         client_max_body_size ${MAX_REQUEST_BODY_SIZE_MB}m;
 
         root /opt/web-app;
-        index index.php;
 
         location / {
-            try_files $uri @php-fpm;
+            try_files $uri @php-fpm-fallback;
         }
 
-        location @php-fpm {
-            rewrite ^(.+)$ /index.php$1 last;
+        location @php-fpm-fallback {
+            rewrite ^(.*)$ /index.php$1 last;
         }
 
-        location ~ \.php(/.*)?$ {
-            fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        location ~ [^/]\.php(/|$) {
+            fastcgi_split_path_info ^(.+?\.php)(/.*)$;
+
+            if (!-f $document_root$fastcgi_script_name) {
+                return 404;
+            }
+
             include fastcgi_params;
             fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_param PATH_INFO $fastcgi_path_info;
             fastcgi_param PHP_VALUE "upload_max_filesize = ${MAX_FILE_UPLOAD_SIZE_MB}M \n post_max_size=${MAX_REQUEST_BODY_SIZE_MB}M";
             fastcgi_pass php-fpm:9000;
         }

@@ -9,6 +9,8 @@ services:
     mem_limit: "128m"
   reverse-proxy:
     build: "."
+    volumes:
+      - "./phpinfo.php:/opt/web-app/index.php:ro"
     command: "nginx-wrapper"
     links:
       - "web-app:php-fpm"
