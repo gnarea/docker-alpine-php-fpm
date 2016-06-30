@@ -72,6 +72,7 @@ get_cli_args_for_debugging() {
 # ===== Main
 
 
+export WORKER_PROCESSES="${WORKER_PROCESSES:-1}"
 exec php-fpm \
     -c /etc/php/php-fpm.conf \
     $(get_cli_arg_for_memory_limit) \

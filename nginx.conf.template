@@ -2,6 +2,8 @@ daemon off;
 
 error_log /proc/self/fd/2 warn;
 
+worker_processes ${WORKER_PROCESSES};
+
 
 events {
     worker_connections 512;

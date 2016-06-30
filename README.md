@@ -8,3 +8,5 @@ Run `nginx-wrapper` and `php-fpm-wrapper`.
   `client_max_body_size` and PHP's `post_max_size`.
 - `MAX_FILE_UPLOAD_SIZE_MB` (e.g., `9`; default: `2`). Sets PHP's
   `upload_max_filesize`.
+- `WORKER_PROCESSES` (e.g., `16`; default: `1`). Sets PHP's `pm.max_children`
+  or Nginx' `worker_processes`.
