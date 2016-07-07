@@ -12,7 +12,12 @@ set -o pipefail
 MEMORY_LIMIT_RATIO="0.9"
 
 
-DEBUG_CLI_ARGS='-d display_errors=On -d display_startup_errors=On -d error_reporting=E_ALL'
+DEBUG_CLI_ARGS='
+    -d display_errors=On
+    -d display_startup_errors=On
+    -d error_reporting=E_ALL
+    -d opcache.enable=0
+'
 
 
 # ===== Constants and functions
@@ -46,7 +51,9 @@ get_cli_arg_for_memory_limit() {
 
     if is_container_memory_limited; then
         local container_memory_bytes="$(get_container_memory_bytes)"
-        local memory_limit_bytes="$(multiply "${container_memory_bytes}" "${MEMORY_LIMIT_RATIO}" )"
+        local memory_limit_bytes="$(
+            multiply "${container_memory_bytes}" "${MEMORY_LIMIT_RATIO}"
+        )"
         cli_arg="-d memory_limit=${memory_limit_bytes}"
     else
         cli_arg=""
@@ -56,11 +63,11 @@ get_cli_arg_for_memory_limit() {
 }
 
 
-get_cli_args_for_debugging() {
+get_cli_args() {
     local cli_args
 
     if [[ "${DEBUG-}" == "true" ]]; then
-        cli_args="${DEBUG_CLI_ARGS}"
+        cli_args="${DEBUG_CLI_ARGS} $(get_cli_arg_for_memory_limit)"
     else
         cli_args=""
     fi
@@ -73,8 +80,4 @@ get_cli_args_for_debugging() {
 
 
 export WORKER_PROCESSES="${WORKER_PROCESSES:-1}"
-exec php-fpm \
-    -c /etc/php5/php-fpm.conf \
-    $(get_cli_arg_for_memory_limit) \
-    $(get_cli_args_for_debugging) \
-    $@
+exec php-fpm -c /etc/php5/php-fpm.conf $(get_cli_args) $@
