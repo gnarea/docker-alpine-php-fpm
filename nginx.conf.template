@@ -1,5 +1,7 @@
 daemon off;
 
+pid /run/nginx.pid;
+
 error_log /proc/self/fd/2 warn;
 
 worker_processes ${WORKER_PROCESSES};
